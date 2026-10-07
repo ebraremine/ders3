@@ -20,42 +20,58 @@
     </header>
 
     <main class="icerik-alani">
-        <form action="#" method="post" class="etkinlik-formu">
-            
-            <div class="form-grup">
-                <label for="ad">Etkinlik adı</label>
-                <input type="text" id="ad" name="ad" value="Kariyer Günleri 2026">
-            </div>
+  <h2>Etkinlik Güncelle</h2>
 
-            <div class="form-grup">
-                <label for="kategori">Kategori</label>
-                <select id="kategori" name="kategori">
-                    <option value="Seminer" selected>Seminer</option>
-                    <option value="Atölye">Atölye</option>
-                    <option value="Söyleşi">Söyleşi</option>
-                    <option value="Teknoloji">Teknoloji</option>
-                </select>
-            </div>
+  <form id="etkinlik-formu" style="max-width: 500px; display: flex; flex-direction: column; gap: 15px;">
+    
+    <div class="form-grup" style="display: flex; flex-direction: column; gap: 5px;">
+      <label for="title"><strong>Etkinlik adı *</strong></label>
+      <input type="text" id="title" name="title" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
 
-            <div class="form-grup">
-                <label for="tarih">Tarih</label>
-                <input type="text" id="tarih" name="tarih" value="12.10.2026">
-            </div>
+    <div class="form-grup" style="display: flex; flex-direction: column; gap: 5px;">
+      <label for="category"><strong>Kategori *</strong></label>
+      <select id="category" name="category" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <option value="">Seçiniz</option>
+        <option value="Atölye">Atölye</option>
+        <option value="Seminer">Seminer</option>
+        <option value="Söyleşi">Söyleşi</option>
+      </select>
+    </div>
 
-            <div class="form-grup">
-                <label for="yer">Yer / Mekan</label>
-                <input type="text" id="yer" name="yer" value="Teknoloji Merkezi Amfisi">
-            </div>
+    <div class="form-grup" style="display: flex; flex-direction: column; gap: 5px;">
+      <label for="date"><strong>Tarih *</strong></label>
+      <input type="date" id="date" name="date" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
 
-            <div class="form-grup">
-                <label for="aciklama">Açıklama</label>
-                <textarea id="aciklama" name="aciklama" rows="3">Mezun söyleşileri ve şirket standları.</textarea>
-            </div>
+    <div class="form-grup" style="display: flex; flex-direction: column; gap: 5px;">
+      <label for="time"><strong>Saat *</strong></label>
+      <input type="time" id="time" name="time" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
 
-            <button type="submit" class="btn-yesil">Güncelle</button>
+    <div class="form-grup" style="display: flex; flex-direction: column; gap: 5px;">
+      <label for="location"><strong>Yer / Mekan *</strong></label>
+      <input type="text" id="location" name="location" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
 
-        </form>
-    </main>
+    <div class="form-grup" style="display: flex; flex-direction: column; gap: 5px;">
+      <label for="capacity"><strong>Kontenjan</strong></label>
+      <input type="number" id="capacity" name="capacity" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div class="form-grup" style="display: flex; flex-direction: column; gap: 5px;">
+      <label for="description"><strong>Açıklama</strong></label>
+      <textarea id="description" name="description" rows="4" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-ana" style="align-self: flex-start; padding: 10px 20px;">Güncelle</button>
+  </form>
+
+  <div id="form-sonuc"></div>
+</main>
+
+
+
 
     <footer>
         <hr>

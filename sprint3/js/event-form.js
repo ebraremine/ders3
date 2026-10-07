@@ -14,7 +14,7 @@ if (!resultContainer && form) {
   form.parentNode.appendChild(resultContainer);
 }
 
-// 1. GÜNCELLEME SAYFASI KONTROLÜ
+// 1. GÜNCELLEME SAYFASINDA FORMU DOLDURMA
 if (isUpdatePage && form) {
   const currentEvent = events.find((e) => e.id === eventId);
 
@@ -22,44 +22,49 @@ if (isUpdatePage && form) {
     form.style.display = "none";
     if (resultContainer) {
       resultContainer.innerHTML = `
-        <div class="hata-kutusu" style="padding: 15px; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; margin-top: 20px;">
-          <p><strong>Güncellenecek etkinlik seçilmedi!</strong> Lütfen önce etkinlikler sayfasından bir etkinlik seçip detayındaki "Bu etkinliği güncelle" butonuna tıklayın.</p>
-          <a href="etkinlikler.html" class="btn btn-ana" style="display:inline-block; margin-top:10px; text-decoration:none;">Etkinliklere Git</a>
-        </div>
-      `;
+        <div style="padding:15px; color:#721c24; background:#f8d7da; border:1px solid #f5c6cb; border-radius:4px; margin-top:20px;">
+          <p>Güncellenecek etkinlik bulunamadı. Lütfen listeden bir etkinlik seçip gelin.</p>
+          <a href="etkinlikler.html" class="btn btn-ana">Etkinliklere Git</a>
+        </div>`;
     }
   } else {
     form.style.display = "block";
-
-    const setInputValue = (key, val) => {
+    const inputs = form.querySelectorAll("input, select, textarea");
+    
+    // Form alanlarını sırayla veya isme göre doldur
+    const setVal = (key, val) => {
       const el = form.querySelector(`[name='${key}']`) || form.querySelector(`#${key}`);
       if (el) el.value = val || "";
     };
 
-    setInputValue("title", currentEvent.title);
-    setInputValue("category", currentEvent.category);
-    setInputValue("date", currentEvent.date);
-    setInputValue("time", currentEvent.time);
-    setInputValue("location", currentEvent.location);
-    setInputValue("capacity", currentEvent.capacity);
-    setInputValue("description", currentEvent.description);
+    setVal("title", currentEvent.title);
+    setVal("category", currentEvent.category);
+    setVal("date", currentEvent.date);
+    setVal("time", currentEvent.time);
+    setVal("location", currentEvent.location);
+    setVal("capacity", currentEvent.capacity);
+    setVal("description", currentEvent.description);
+
+    // Eğer name/id ile eşleşmediyse sırasıyla doldur (Yedek Plan)
+    if (inputs[0] && !inputs[0].value) inputs[0].value = currentEvent.title || "";
+    if (inputs[1] && !inputs[1].value) inputs[1].value = currentEvent.category || "";
+    if (inputs[2] && !inputs[2].value) inputs[2].value = currentEvent.date || "";
   }
 }
 
-// 2. FORM DOĞRULAMA VE GÖNDERİM
+// 2. FORM GÖNDERİMİ VE BAŞARI MESAJI
 if (form) {
   form.setAttribute("novalidate", "true");
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    // Temizlik
+    // Hata ve eski sonuçları temizle
     document.querySelectorAll(".hata-mesaji").forEach((el) => el.remove());
     if (resultContainer) resultContainer.innerHTML = "";
 
-    form.querySelectorAll("input, select, textarea").forEach((input) => {
-      input.style.borderColor = "";
-    });
+    const inputs = Array.from(form.querySelectorAll("input, select, textarea"));
+    inputs.forEach((input) => (input.style.borderColor = ""));
 
     let isValid = true;
 
@@ -72,53 +77,35 @@ if (form) {
         errorElem.style.color = "red";
         errorElem.style.display = "block";
         errorElem.style.marginTop = "4px";
-        errorElem.style.fontWeight = "bold";
         errorElem.textContent = message;
         input.parentNode.insertBefore(errorElem, input.nextSibling);
       }
     }
 
-    // Inputları Esnek Yakala (Hem id hem name destekli)
-    const titleInput = form.querySelector("[name='title']") || form.querySelector("#title") || form.querySelectorAll("input")[0];
-    const categoryInput = form.querySelector("[name='category']") || form.querySelector("#category") || form.querySelector("select");
-    const dateInput = form.querySelector("[name='date']") || form.querySelector("#date") || form.querySelector("input[type='date']");
-    const timeInput = form.querySelector("[name='time']") || form.querySelector("#time") || form.querySelector("input[type='time']");
-    const locationInput = form.querySelector("[name='location']") || form.querySelector("#location") || form.querySelectorAll("input")[1];
-    const capacityInput = form.querySelector("[name='capacity']") || form.querySelector("#capacity");
-    const descriptionInput = form.querySelector("[name='description']") || form.querySelector("#description") || form.querySelector("textarea");
+    // Inputları hem isme hem sıraya göre güvenli yakala
+    const titleInput = form.querySelector("[name='title'], #title") || inputs[0];
+    const categoryInput = form.querySelector("[name='category'], #category") || form.querySelector("select");
+    const dateInput = form.querySelector("[name='date'], #date") || form.querySelector("input[type='date']");
+    const locationInput = form.querySelector("[name='location'], #location") || inputs[3];
 
-    // Zorunlu Alan Doğrulamaları
     if (!titleInput || titleInput.value.trim().length < 3) {
       showError(titleInput, "Etkinlik adı en az 3 karakter olmalı.");
     }
-
-    if (!categoryInput || !categoryInput.value || categoryInput.value === "Seçiniz" || categoryInput.value === "") {
+    if (!categoryInput || !categoryInput.value || categoryInput.value === "Seçiniz") {
       showError(categoryInput, "Bir kategori seçin.");
     }
-
     if (!dateInput || !dateInput.value) {
       showError(dateInput, "Tarih seçin.");
     }
 
-    if (!timeInput || !timeInput.value) {
-      showError(timeInput, "Saat seçin.");
-    }
-
-    if (!locationInput || !locationInput.value.trim()) {
-      showError(locationInput, "Yer bilgisini yazın.");
-    }
-
-    // Bütün alanlar geçerliyse Başarı Mesajını Bas
+    // HATA YOKSA BAŞARI MESAJINI BAS
     if (isValid) {
       const formData = {
-        id: isUpdatePage ? eventId : `event-${events.length + 1}`,
+        id: eventId || `event-${events.length + 1}`,
         title: titleInput ? titleInput.value.trim() : "",
         category: categoryInput ? categoryInput.value : "",
         date: dateInput ? dateInput.value : "",
-        time: timeInput ? timeInput.value : "",
-        location: locationInput ? locationInput.value.trim() : "",
-        capacity: capacityInput && capacityInput.value ? Number(capacityInput.value) : null,
-        description: descriptionInput ? descriptionInput.value.trim() : ""
+        location: locationInput ? locationInput.value.trim() : ""
       };
 
       const titleText = isUpdatePage ? "Etkinlik güncellendi" : "Etkinlik oluşturuldu";
@@ -131,4 +118,4 @@ if (form) {
       `;
     }
   });
-} 
+}
