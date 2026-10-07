@@ -1,15 +1,12 @@
 // js/event-form.js
 import { events } from "./data.js";
 
-// 1. URL parametresinden id okuma
 const urlParams = new URLSearchParams(window.location.search);
 const eventId = urlParams.get("id");
 
-// 2. Sayfadaki form ve mesaj alanlarını seçme
 const form = document.querySelector("form");
 const isUpdatePage = window.location.pathname.includes("etkinlik-guncelle.html");
 
-// Hata / Başarı mesaj kutuları için dinamik kapsayıcı
 let resultContainer = document.querySelector("#form-sonuc");
 if (!resultContainer && form) {
   resultContainer = document.createElement("div");
@@ -17,91 +14,101 @@ if (!resultContainer && form) {
   form.parentNode.appendChild(resultContainer);
 }
 
-// --- GÜNCELLEME SAYFASI MANTIĞI (etkinlik-guncelle.html) ---
-if (isUpdatePage) {
+// 1. GÜNCELLEME SAYFASI KONTROLÜ
+if (isUpdatePage && form) {
   const currentEvent = events.find((e) => e.id === eventId);
 
   if (!eventId || !currentEvent) {
-    // ID yoksa veya geçersizse formu gizle, uyarı göster
-    if (form) form.style.display = "none";
+    form.style.display = "none";
     if (resultContainer) {
       resultContainer.innerHTML = `
         <div class="hata-kutusu" style="padding: 15px; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; margin-top: 20px;">
-          <p>Güncellenecek etkinlik seçilmedi. Önce listeden bir etkinlik seçin, detay sayfasındaki "Bu etkinliği güncelle" butonunu kullanın.</p>
-          <a href="etkinlikler.html" class="btn btn-ana" style="display:inline-block; margin-top:10px;">Etkinliklere Git</a>
+          <p><strong>Güncellenecek etkinlik seçilmedi!</strong> Lütfen önce etkinlikler sayfasından bir etkinlik seçip detayındaki "Bu etkinliği güncelle" butonuna tıklayın.</p>
+          <a href="etkinlikler.html" class="btn btn-ana" style="display:inline-block; margin-top:10px; text-decoration:none;">Etkinliklere Git</a>
         </div>
       `;
     }
   } else {
-    // Formu etkinliğin mevcut verileriyle doldur
-    if (form.elements["title"]) form.elements["title"].value = currentEvent.title;
-    if (form.elements["category"]) form.elements["category"].value = currentEvent.category;
-    if (form.elements["date"]) form.elements["date"].value = currentEvent.date;
-    if (form.elements["time"]) form.elements["time"].value = currentEvent.time;
-    if (form.elements["location"]) form.elements["location"].value = currentEvent.location;
-    if (form.elements["capacity"]) form.elements["capacity"].value = currentEvent.capacity;
-    if (form.elements["description"]) form.elements["description"].value = currentEvent.description;
+    form.style.display = "block";
+
+    const setInputValue = (key, val) => {
+      const el = form.querySelector(`[name='${key}']`) || form.querySelector(`#${key}`);
+      if (el) el.value = val || "";
+    };
+
+    setInputValue("title", currentEvent.title);
+    setInputValue("category", currentEvent.category);
+    setInputValue("date", currentEvent.date);
+    setInputValue("time", currentEvent.time);
+    setInputValue("location", currentEvent.location);
+    setInputValue("capacity", currentEvent.capacity);
+    setInputValue("description", currentEvent.description);
   }
 }
 
-// --- FORM DOĞRULAMA VE GÖNDERME MANTIĞI (Ekle & Güncelle) ---
+// 2. FORM DOĞRULAMA VE GÖNDERİM
 if (form) {
+  form.setAttribute("novalidate", "true");
+
   form.addEventListener("submit", function (e) {
-    // Sayfanın yenilenmesini engelle
     e.preventDefault();
 
-    let isValid = true;
-    
-    // Eski hata mesajlarını ve kırmızı kenarlıkları temizle
+    // Temizlik
     document.querySelectorAll(".hata-mesaji").forEach((el) => el.remove());
-    Array.from(form.elements).forEach((input) => {
+    if (resultContainer) resultContainer.innerHTML = "";
+
+    form.querySelectorAll("input, select, textarea").forEach((input) => {
       input.style.borderColor = "";
     });
 
-    // Doğrulama Yardımcı Fonksiyonu
+    let isValid = true;
+
     function showError(input, message) {
       isValid = false;
-      input.style.borderColor = "red";
-      const errorElem = document.createElement("small");
-      errorElem.className = "hata-mesaji";
-      errorElem.style.color = "red";
-      errorElem.style.display = "block";
-      errorElem.style.marginTop = "4px";
-      errorElem.textContent = message;
-      input.parentNode.insertBefore(errorElem, input.nextSibling);
+      if (input) {
+        input.style.borderColor = "red";
+        const errorElem = document.createElement("small");
+        errorElem.className = "hata-mesaji";
+        errorElem.style.color = "red";
+        errorElem.style.display = "block";
+        errorElem.style.marginTop = "4px";
+        errorElem.style.fontWeight = "bold";
+        errorElem.textContent = message;
+        input.parentNode.insertBefore(errorElem, input.nextSibling);
+      }
     }
 
-    // Inputları Seçme
-    const titleInput = form.elements["title"] || form.querySelector("[name='title']");
-    const categoryInput = form.elements["category"] || form.querySelector("[name='category']");
-    const dateInput = form.elements["date"] || form.querySelector("[name='date']");
-    const timeInput = form.elements["time"] || form.querySelector("[name='time']");
-    const locationInput = form.elements["location"] || form.querySelector("[name='location']");
-    const capacityInput = form.elements["capacity"] || form.querySelector("[name='capacity']");
-    const descriptionInput = form.elements["description"] || form.querySelector("[name='description']");
+    // Inputları Esnek Yakala (Hem id hem name destekli)
+    const titleInput = form.querySelector("[name='title']") || form.querySelector("#title") || form.querySelectorAll("input")[0];
+    const categoryInput = form.querySelector("[name='category']") || form.querySelector("#category") || form.querySelector("select");
+    const dateInput = form.querySelector("[name='date']") || form.querySelector("#date") || form.querySelector("input[type='date']");
+    const timeInput = form.querySelector("[name='time']") || form.querySelector("#time") || form.querySelector("input[type='time']");
+    const locationInput = form.querySelector("[name='location']") || form.querySelector("#location") || form.querySelectorAll("input")[1];
+    const capacityInput = form.querySelector("[name='capacity']") || form.querySelector("#capacity");
+    const descriptionInput = form.querySelector("[name='description']") || form.querySelector("#description") || form.querySelector("textarea");
 
-    // Kontroller
-    if (titleInput && titleInput.value.trim().length < 3) {
-      showError(titleInput, "Etkinlik adı en az 3 karakter olmalıdır.");
+    // Zorunlu Alan Doğrulamaları
+    if (!titleInput || titleInput.value.trim().length < 3) {
+      showError(titleInput, "Etkinlik adı en az 3 karakter olmalı.");
     }
 
-    if (categoryInput && (!categoryInput.value || categoryInput.value === "Seçiniz")) {
+    if (!categoryInput || !categoryInput.value || categoryInput.value === "Seçiniz" || categoryInput.value === "") {
       showError(categoryInput, "Bir kategori seçin.");
     }
 
-    if (dateInput && !dateInput.value) {
+    if (!dateInput || !dateInput.value) {
       showError(dateInput, "Tarih seçin.");
     }
 
-    if (timeInput && !timeInput.value) {
+    if (!timeInput || !timeInput.value) {
       showError(timeInput, "Saat seçin.");
     }
 
-    if (locationInput && !locationInput.value.trim()) {
+    if (!locationInput || !locationInput.value.trim()) {
       showError(locationInput, "Yer bilgisini yazın.");
     }
 
-    // Form Başarılıysa
+    // Bütün alanlar geçerliyse Başarı Mesajını Bas
     if (isValid) {
       const formData = {
         id: isUpdatePage ? eventId : `event-${events.length + 1}`,
@@ -114,13 +121,14 @@ if (form) {
         description: descriptionInput ? descriptionInput.value.trim() : ""
       };
 
-      // Başarı kutusu ve JSON çıktısı gösterimi
+      const titleText = isUpdatePage ? "Etkinlik güncellendi" : "Etkinlik oluşturuldu";
+
       resultContainer.innerHTML = `
-        <div class="basari-kutusu" style="padding: 15px; color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; margin-top: 20px;">
-          <p><strong>${isUpdatePage ? "Etkinlik güncellendi" : "Etkinlik oluşturuldu"} (bu sprintte kaydedilmez):</strong></p>
-          <pre style="background: #ffffff; padding: 10px; border-radius: 4px; overflow-x: auto;">${JSON.stringify(formData, null, 2)}</pre>
+        <div class="basari-kutusu" style="padding: 15px; color: #2e7d32; background-color: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 6px; margin-top: 20px;">
+          <p style="margin: 0 0 10px 0; font-size: 14px;"><strong>${titleText} (bu sprintte kaydedilmez):</strong></p>
+          <pre style="background: #ffffff; padding: 10px; border-radius: 4px; border: 1px solid #e0e0e0; font-family: monospace; font-size: 13px; margin: 0; white-space: pre-wrap;">${JSON.stringify(formData, null, 2)}</pre>
         </div>
       `;
     }
   });
-}
+} 
