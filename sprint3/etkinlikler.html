@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tüm Etkinlikler</title>
+    <!-- Kendi numaranızla bağlı CSS dosyası -->
+    <link rel="stylesheet" href="css/2311012011.css">
+    <script type="module" src="js/event-list.js"></script>
+</head>
+<body>
+
+    <header class="yesil-header">
+        <h1>Tüm Etkinlikler</h1>
+        <nav>
+            <a href="index.html">Ana Sayfa</a> | 
+            <a href="etkinlikler.html">Tüm Etkinlikler</a> | 
+            <a href="etkinlik-ekle.html">Etkinlik Ekle</a>
+        </nav>
+    </header>
+
+        <main class="icerik-alani">
+  <h2>Tüm Etkinlikler</h2>
+
+  <!-- 1. ÜST KISIM: Arama ve Kategori Kutusu (Yan Yana) -->
+  <div class="filtre-kapsayici" style="background: #ffffff; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
+    <form id="filtre-formu" style="display: flex; gap: 20px; flex-wrap: wrap;" onsubmit="return false;">
+      
+      <!-- Etkinlik Ara -->
+      <div style="flex: 2; min-width: 200px;">
+        <label for="arama-input" style="display: block; font-weight: bold; margin-bottom: 8px;">Etkinlik ara</label>
+        <input 
+          type="search" 
+          id="arama-input" 
+          placeholder="Örn. atölye, kariyer" 
+          style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+        />
+      </div>
+
+      <!-- Kategori -->
+      <div style="flex: 1; min-width: 150px;">
+        <label for="kategori-select" style="display: block; font-weight: bold; margin-bottom: 8px;">Kategori</label>
+        <select id="kategori-select" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+          <option value="">Tümü</option>
+          <option value="Atölye">Atölye</option>
+          <option value="Seminer">Seminer</option>
+          <option value="Söyleşi">Söyleşi</option>
+        </select>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- 2. ORTA KISIM: Kaç Etkinlik Bulunduğu Bilgisi -->
+  <p id="sonuc-sayisi" style="color: #2e7d32; font-weight: bold; margin-bottom: 20px;">6 etkinlik listeleniyor.</p>
+
+  <!-- 3. ALT KISIM: Kartların Yan Yana Dizildiği Izgara (Grid) -->
+  <section id="etkinlik-listesi" class="etkinlik-listesi">
+    <!-- Kartlar JS (event-list.js) tarafından buraya yüklenecek -->
+  </section>
+</main>
+
+        
+  <form 
+
+
+<-- Kaç etkinlik listelendiğini gösteren metin -->
+<p id="sonuc-sayisi" style="color: #2e7d32; font-weight: bold; margin-bottom: 15px;">6 etkinlik listeleniyor.</p>
+                <section id="etkinlik-listesi" class="etkinlik-listesi">
+  <!-- JavaScript kartları buraya yükleyecek -->
+</section>
+
+        </section>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Etkinlik Ekle</title>
+    <!-- Kendi numaranla CSS dosya bağlantısı -->
+    <link rel="stylesheet" href="css/2311012011.css">
+    <script type="module" src="js/event-form.js"></script>
+</head>
+<body>
+
+    <header class="yesil-header">
+        <h1>Etkinlik Ekle</h1>
+        <nav>
+            <a href="index.html">Ana Sayfa</a> | 
+            <a href="etkinlikler.html">Etkinlikler</a> | 
+            <a href="etkinlik-ekle.html">Ekle</a> | 
+        </nav>
+    </header>
+
+    <main class="icerik-alani">
+        <form action="#" method="post" class="etkinlik-formu">
+            
+            <div class="form-grup">
+                <label for="ad">Etkinlik adı</label>
+                <input type="text" id="ad" name="ad" placeholder="Etkinlik adını giriniz">
+            </div>
+
+            <div class="form-grup">
+                <label for="kategori">Kategori</label>
+                <select id="kategori" name="kategori">
+                    <option value="">Seçiniz...</option>
+                    <option value="teknoloji">Teknoloji</option>
+                    <option value="muzik">Müzik</option>
+                    <option value="tiyatro">Tiyatro</option>
+                    <option value="spor">Spor</option>
+                    <option value="egitim">Eğitim</option>
+                </select>
+            </div>
+
+            <div class="form-grup">
+                <label for="tarih">Tarih</label>
+                <!-- Ödev görselindeki boş/hatalı alan kırmızı çerçevesi -->
+                <input type="text" id="tarih" name="tarih" placeholder="boş bırakıldı" class="hatali-input">
+            </div>
+
+            <div class="form-grup">
+                <label for="yer">Yer / Mekan</label>
+                <input type="text" id="yer" name="yer" placeholder="Etkinlik mekanını giriniz">
+            </div>
+
+            <div class="form-grup">
+                <label for="aciklama">Açıklama</label>
+                <textarea id="aciklama" name="aciklama" rows="3" placeholder="Etkinlik detaylarını yazınız..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-yesil">Kaydet</button>
+
+        </form>
+    </main>
+
+</body>
+</html> 
