@@ -1,0 +1,224 @@
+/* ========================================== */
+/* 1. ÖDEV DEĞİŞKENLERİ VE GENEL AYARLAR       */
+/* ========================================== */
+:root {
+    --no: 2311012011;
+    --ton: mod(var(--no), 360);
+    --renk-ana: hsl(var(--ton) 65% 38%);
+    --renk-zemin: hsl(var(--ton) 30% 97%);
+    --font: Verdana, sans-serif; /* Numara son hanesi 1 -> Verdana */
+}
+
+body {
+    font-family: var(--font);
+    margin: 0;
+    padding: 0;
+    background-color: var(--renk-zemin);
+    color: #333;
+}
+
+/* ========================================== */
+/* 2. BAŞLIK VE MENÜ (HEADER)                 */
+/* ========================================== */
+.yesil-header {
+    background-color: #1a9e37;
+    color: white;
+    padding: 20px;
+}
+
+.yesil-header h1 {
+    margin: 0 0 10px 0;
+}
+
+.yesil-header p {
+    margin: 0 0 15px 0;
+    opacity: 0.9;
+}
+
+.yesil-header nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.yesil-header nav a:hover {
+    text-decoration: underline;
+}
+
+/* Sayfa İçerik Alanı */
+.icerik-alani {
+    padding: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* ========================================== */
+/* 3. GRID VE KART DİZİLİMLERİ                */
+/* ========================================== */
+
+/* Ana Sayfa: 2'li Grid */
+.ana-sayfa-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 15px;
+}
+
+@media (min-width: 768px) {
+    .ana-sayfa-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Etkinlikler Sayfası: 3'lü Grid */
+.etkinlik-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+@media (min-width: 768px) {
+    .etkinlik-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Kart Yapısı */
+.etkinlik-karti {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.etkinlik-karti h3 {
+    margin-top: 0;
+    color: #1a9e37;
+}
+
+.detay-link {
+    color: #1a9e37;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.detay-link:hover {
+    text-decoration: underline;
+}
+
+/* ========================================== */
+/* 4. ETKİNLİK DETAY SAYFASI (FLEXBOX)         */
+/* ========================================== */
+.detay-kapsayici {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+@media (min-width: 768px) {
+    .detay-kapsayici {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+.afis-alani {
+    margin: 0;
+    flex: 1;
+}
+
+.afis-resmi {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.kunye-alani {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.kunye-listesi {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    row-gap: 12px;
+    margin: 0;
+}
+
+.kunye-listesi dt { font-weight: bold; }
+.kunye-listesi dd { margin: 0; }
+
+/* ========================================== */
+/* 5. FORM STİLLERİ (EKLE VE GÜNCELLE)        */
+/* ========================================== */
+.etkinlik-formu {
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.form-grup {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-grup label {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.form-grup input,
+.form-grup select,
+.form-grup textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.hatali-input {
+    border: 1px solid #d32f2f !important;
+    background-color: #fff8f8;
+}
+
+.hatali-input::placeholder {
+    color: #d32f2f;
+}
+
+.btn-yesil {
+    background-color: #1a9e37;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    align-self: flex-start;
+    font-family: var(--font);
+}
+#etkinlik-listesi {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 20px !important;
+  margin-bottom: 20px !important;
+}
+
+@media (max-width: 768px) {
+  #etkinlik-listesi {
+    grid-template-columns: 1fr !important;
+  }
+}
