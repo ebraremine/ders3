@@ -4,10 +4,10 @@ export interface CampusEvent {
   id: string;
   title: string;
   category: Category;
-  capacity: number;
   date: string;
-  time: string;
   location: string;
+  capacity: number;
   description: string;
-  image?: string;
+  summary?: string;
+  imageUrl?: string;
 }
