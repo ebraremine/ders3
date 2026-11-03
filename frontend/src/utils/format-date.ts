@@ -1,17 +1,10 @@
-export function formatDate(dateStr: string): string {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr;
-
-  const day = date.getDate();
+export function formatDate(dateString: string): string {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("-");
   const months = [
     "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
     "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
   ];
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-
-  return `${day} ${month} ${year}, ${hours}:${minutes}`;
+  const monthIndex = parseInt(month, 10) - 1;
+  return `${parseInt(day, 10)} ${months[monthIndex]} ${year}`;
 }

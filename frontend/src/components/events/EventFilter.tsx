@@ -1,47 +1,41 @@
-interface EventFilterProps {
+import type { Category } from "../../types/campus-event";
+
+interface Props {
   searchText: string;
-  category: string;
-  categories: string[];
   onSearchChange: (text: string) => void;
-  onCategoryChange: (category: string) => void;
+  selectedCategory: Category | "";
+  onCategoryChange: (cat: Category | "") => void;
+  categories: Category[];
 }
 
-function EventFilter({
+export default function EventFilter({
   searchText,
-  category,
-  categories,
   onSearchChange,
+  selectedCategory,
   onCategoryChange,
-}: EventFilterProps) {
+  categories,
+}: Props) {
   return (
-    <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>
-      <div>
-        <label htmlFor="search"><strong>Etkinlik ara</strong></label><br />
-        <input
-          id="search"
-          type="search"
-          placeholder="Örn: atölye, kariyer"
-          value={searchText}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="category"><strong>Kategori</strong></label><br />
-        <select
-          id="category"
-          value={category}
-          onChange={(e) => onCategoryChange(e.target.value)}
-        >
-          <option value="">Tümü</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div className="arama-filtre-kutusu">
+      <input
+        type="text"
+        placeholder="Etkinlik ara..."
+        value={searchText}
+        onChange={(e) => onSearchChange(e.target.value)}
+        className="arama-input"
+      />
+      <select
+        value={selectedCategory}
+        onChange={(e) => onCategoryChange(e.target.value as Category | "")}
+        className="kategori-select"
+      >
+        <option value="">Tüm Kategoriler</option>
+        {categories.map((c) => (
+          <option key={c} value={c}>
+            {c}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
-
-export default EventFilter;

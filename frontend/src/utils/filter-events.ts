@@ -1,32 +1,19 @@
 import type { CampusEvent, Category } from "../types/campus-event";
 
-// Metne göre arama yapma (başlık veya açıklamada)
-export function searchEvents(
-  list: CampusEvent[],
-  text: string
-): CampusEvent[] {
-  const q = text.trim().toLocaleLowerCase("tr-TR");
-  if (!q) return list;
-  return list.filter(
-    (e) =>
-      e.title.toLocaleLowerCase("tr-TR").includes(q) ||
-      e.description.toLocaleLowerCase("tr-TR").includes(q)
-  );
-}
-
-// Kategoriye göre filtreleme
-export function filterByCategory(
-  list: CampusEvent[],
+export function filterEvents(
+  events: CampusEvent[],
+  searchText: string,
   category: Category | ""
 ): CampusEvent[] {
-  if (category === "") return list;
-  return list.filter((e) => e.category === category);
+  return events.filter((e) => {
+    const matchesSearch =
+      e.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      e.description.toLowerCase().includes(searchText.toLowerCase());
+    const matchesCategory = category === "" || e.category === category;
+    return matchesSearch && matchesCategory;
+  });
 }
 
-// ID ile tek bir etkinlik bulma
-export function findEventById(
-  list: CampusEvent[],
-  id: string
-): CampusEvent | undefined {
-  return list.find((e) => e.id === id);
+export function findEventById(events: CampusEvent[], id: string): CampusEvent | undefined {
+  return events.find((e) => e.id === id);
 }

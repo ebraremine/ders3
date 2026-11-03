@@ -1,28 +1,16 @@
 import type { CampusEvent } from "../../types/campus-event";
 import EventCard from "./EventCard";
 
-interface EventListProps {
-  events: CampusEvent[];
-  onShowDetail: (id: string) => void;
-  emptyText?: string;
-}
-
-function EventList({ events, onShowDetail, emptyText = "Etkinlik bulunamadı." }: EventListProps) {
+export default function EventList({ events }: { events: CampusEvent[] }) {
   if (events.length === 0) {
-    return <p className="sonuc-sayisi">{emptyText}</p>;
+    return <p className="bos-mesaj">Aradığınız kriterlere uygun etkinlik bulunamadı.</p>;
   }
 
   return (
-    <div className="etkinlik-grid">
-      {events.map((event) => (
-        <EventCard
-          key={event.id}
-          event={event}
-          onShowDetail={onShowDetail}
-        />
+    <div className="etkinlik-izgara">
+      {events.map((e) => (
+        <EventCard key={e.id} event={e} />
       ))}
     </div>
   );
 }
-
-export default EventList;

@@ -1,95 +1,138 @@
-import { useState } from "react";
-import type { CampusEvent, Category } from "../../types/campus-event";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import type { EventFormData, EventFormErrors, Category } from "../../types/campus-event";
+import { validateEvent } from "../../utils/validate-event";
 
-interface EventFormProps {
-  initialValues?: CampusEvent;
-  onSubmit: (formData: Omit<CampusEvent, "id">) => void;
-  onCancel: () => void;
-  submitButtonText?: string;
+interface Props {
+  initialData: EventFormData;
+  submitText: string;
+  onSubmit: (data: EventFormData) => void;
 }
 
-function EventForm({
-  initialValues,
-  onSubmit,
-  onCancel,
-  submitButtonText = "Kaydet",
-}: EventFormProps) {
-  const [title, setTitle] = useState(initialValues?.title || "");
-  const [category, setCategory] = useState<Category>(initialValues?.category || "Seminer");
-  const [date, setDate] = useState(initialValues?.date || "");
-  const [location, setLocation] = useState(initialValues?.location || "");
-  const [capacity, setCapacity] = useState(initialValues?.capacity || 50);
-  const [summary, setSummary] = useState(initialValues?.summary || "");
-  const [description, setDescription] = useState(initialValues?.description || "");
-  const [imageUrl, setImageUrl] = useState(initialValues?.imageUrl || "");
+const categories: Category[] = ["Seminer", "Atölye", "Söyleşi", "Yarışma"];
 
-  const handleSubmit = (e: React.FormEvent) => {
+export default function EventForm({ initialData, submitText, onSubmit }: Props) {
+  const [data, setData] = useState<EventFormData>(initialData);
+  const [errors, setErrors] = useState<EventFormErrors>({});
+
+  function handleChange(
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) {
+    const { name, value } = e.target;
+    setData((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    onSubmit({
-      title,
-      category,
-      date,
-      location,
-      capacity: Number(capacity),
-      summary,
-      description,
-      imageUrl: imageUrl || "https://picsum.photos/400/250",
-    });
-  };
+    const foundErrors = validateEvent(data);
+    setErrors(foundErrors);
+
+    if (Object.keys(foundErrors).length === 0) {
+      onSubmit(data);
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="etkinlik-formu">
-      <div>
-        <label>Etkinlik Başlığı</label><br />
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+    <form className="etkinlik-formu" onSubmit={handleSubmit} noValidate>
+      <div className="form-grup">
+        <label htmlFor="title">Etkinlik Adı</label>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          value={data.title}
+          onChange={handleChange}
+          aria-invalid={errors.title ? true : undefined}
+        />
+        {errors.title && <span className="hata-metni">{errors.title}</span>}
       </div>
 
-      <div>
-        <label>Kategori</label><br />
-        <select value={category} onChange={(e) => setCategory(e.target.value as Category)}>
-          <option value="Seminer">Seminer</option>
-          <option value="Atölye">Atölye</option>
-          <option value="Söyleşi">Söyleşi</option>
-          <option value="Yarışma">Yarışma</option>
+      <div className="form-grup">
+        <label htmlFor="category">Kategori</label>
+        <select
+          id="category"
+          name="category"
+          value={data.category}
+          onChange={handleChange}
+          aria-invalid={errors.category ? true : undefined}
+        >
+          <option value="">Seçiniz</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
         </select>
+        {errors.category && <span className="hata-metni">{errors.category}</span>}
       </div>
 
-      <div>
-        <label>Tarih</label><br />
-        <input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} required />
+      <div className="form-satir">
+        <div className="form-grup">
+          <label htmlFor="date">Tarih</label>
+          <input
+            id="date"
+            name="date"
+            type="date"
+            value={data.date}
+            onChange={handleChange}
+            aria-invalid={errors.date ? true : undefined}
+          />
+          {errors.date && <span className="hata-metni">{errors.date}</span>}
+        </div>
+
+        <div className="form-grup">
+          <label htmlFor="time">Saat</label>
+          <input
+            id="time"
+            name="time"
+            type="time"
+            value={data.time}
+            onChange={handleChange}
+            aria-invalid={errors.time ? true : undefined}
+          />
+          {errors.time && <span className="hata-metni">{errors.time}</span>}
+        </div>
       </div>
 
-      <div>
-        <label>Konum</label><br />
-        <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} required />
+      <div className="form-satir">
+        <div className="form-grup">
+          <label htmlFor="location">Yer</label>
+          <input
+            id="location"
+            name="location"
+            type="text"
+            value={data.location}
+            onChange={handleChange}
+            aria-invalid={errors.location ? true : undefined}
+          />
+          {errors.location && <span className="hata-metni">{errors.location}</span>}
+        </div>
+
+        <div className="form-grup">
+          <label htmlFor="capacity">Kontenjan</label>
+          <input
+            id="capacity"
+            name="capacity"
+            type="number"
+            value={data.capacity}
+            onChange={handleChange}
+            aria-invalid={errors.capacity ? true : undefined}
+          />
+          {errors.capacity && <span className="hata-metni">{errors.capacity}</span>}
+        </div>
       </div>
 
-      <div>
-        <label>Kontenjan</label><br />
-        <input type="number" value={capacity} onChange={(e) => setCapacity(Number(e.target.value))} required />
+      <div className="form-grup">
+        <label htmlFor="description">Açıklama</label>
+        <textarea
+          id="description"
+          name="description"
+          rows={4}
+          value={data.description}
+          onChange={handleChange}
+          aria-invalid={errors.description ? true : undefined}
+        />
+        {errors.description && <span className="hata-metni">{errors.description}</span>}
       </div>
 
-      <div>
-        <label>Görsel URL</label><br />
-        <input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." />
-      </div>
-
-      <div>
-        <label>Özet (Kart Görünümü)</label><br />
-        <input type="text" value={summary} onChange={(e) => setSummary(e.target.value)} required />
-      </div>
-
-      <div>
-        <label>Detaylı Açıklama</label><br />
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} required />
-      </div>
-
-      <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
-        <button type="submit" className="btn-yesil">{submitButtonText}</button>
-        <button type="button" className="btn-gri" onClick={onCancel}>İptal</button>
-      </div>
+      <button type="submit" className="buton">{submitText}</button>
     </form>
   );
 }
-
-export default EventForm;
