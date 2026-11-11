@@ -1,0 +1,43 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Kampus API Requests",
+  "dateExported": "2026-11-11",
+  "version": "1.1",
+  "folders": [],
+  "requests": [
+    {
+      "name": "1. Health Check",
+      "url": "http://localhost:3000/health",
+      "method": "GET"
+    },
+    {
+      "name": "2. Get All Events",
+      "url": "http://localhost:3000/events",
+      "method": "GET"
+    },
+    {
+      "name": "3. Get Events by Category",
+      "url": "http://localhost:3000/events?category=Akademik",
+      "method": "GET"
+    },
+    {
+      "name": "4. Get Single Event",
+      "url": "http://localhost:3000/events/event-1",
+      "method": "GET"
+    },
+    {
+      "name": "5. Get Non-Existing Event (404 Test)",
+      "url": "http://localhost:3000/events/event-999",
+      "method": "GET"
+    },
+    {
+      "name": "6. Create Event (POST)",
+      "url": "http://localhost:3000/events",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Mobil Uygulama Geliştirme\",\n  \"category\": \"Atölye\",\n  \"date\": \"2026-12-20\",\n  \"capacity\": 30,\n  \"time\": \"11:00\",\n  \"location\": \"Lab 2\",\n  \"description\": \"Flutter ile mobil uygulama hazırlama.\"\n}"
+      }
+    }
+  ]
+}
