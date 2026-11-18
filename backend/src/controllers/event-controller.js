@@ -1,49 +1,95 @@
-import { events } from "../data/events.js";
+const Event = require('../models/event-model');
 
-// GET /events (İsteğe bağlı kategori filtreleme)
-export function getEvents(req, res) {
-  const { category } = req.query;
-  const list = category
-    ? events.filter((e) => e.category === category)
-    : events;
-  
-  return res.json(list);
-}
+// 1. Sistem Durumu ve Öğrenci Numarası (GET /health)
+exports.getHealth = (req, res) => {
+  res.json({
+    status: "OK",
+    studentId: "2311012011",
+    message: "Kampüs Etkinlikleri Backend API aktif çalışıyor 🚀"
+  });
+};
 
-// GET /events/:id (Bulunamazsa 404 hatası)
-export function getEventById(req, res) {
-  const { id } = req.params;
-  const event = events.find((e) => e.id === id);
-
-  if (!event) {
-    return res.status(404).json({ error: { message: "Event not found" } });
+// 2. Tüm Etkinlikleri Listele (GET /events)
+exports.getAllEvents = async (req, res) => {
+  try {
+    const events = await Event.find();
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ error: "Etkinlikler getirilirken hata oluştu: " + err.message });
   }
+};
 
-  return res.json(event);
-}
+// 3. Tekil Etkinlik Getir (GET /events/:id)
+exports.getEventById = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) {
+      return res.status(404).json({ message: "Aranan ID'ye sahip etkinlik bulunamadı." });
+    }
+    res.json(event);
+  } catch (err) {
+    res.status(500).json({ error: "Etkinlik detayı getirilirken hata oluştu: " + err.message });
+  }
+};
 
-// POST /events (Eksik veride 400, başarılıysa 201)
-export function createEvent(req, res) {
-  const { title, category, capacity, date, time, location, description } = req.body ?? {};
-
-  // Slayt 12: Zorunlu alan kontrolü
-  if (!title || !category || !date) {
-    return res.status(400).json({
-      error: { message: "title, category and date are required" }
+// 4. Yeni Etkinlik Ekle (POST /events)
+exports.createEvent = async (req, res) => {
+  try {
+    const newEvent = new Event({
+      title: req.body.title,
+      category: req.body.category,
+      capacity: Number(req.body.capacity) || 100,
+      date: req.body.date,
+      time: req.body.time || "14:00",
+      location: req.body.location,
+      description: req.body.description,
+      image: req.body.image || "/afis.svg"
     });
+
+    const savedEvent = await newEvent.save();
+    res.status(201).json(savedEvent);
+  } catch (err) {
+    res.status(400).json({ error: "Etkinlik eklenirken hata oluştu: " + err.message });
   }
+};
 
-  const newEvent = {
-    id: `event-${Date.now()}`, // Benzersiz ID
-    title,
-    category,
-    date,
-    capacity: Number(capacity) || 0,
-    time: time ?? "",
-    location: location ?? "",
-    description: description ?? ""
-  };
+// 5. Etkinlik Güncelle (PUT /events/:id)
+exports.updateEvent = async (req, res) => {
+  try {
+    const updatedEvent = await Event.findByIdAndUpdate(
+      req.params.id,
+      {
+        title: req.body.title,
+        category: req.body.category,
+        capacity: Number(req.body.capacity) || 100,
+        date: req.body.date,
+        time: req.body.time || "14:00",
+        location: req.body.location,
+        description: req.body.description,
+        image: req.body.image || "/afis.svg"
+      },
+      { new: true, runValidators: true }
+    );
 
-  events.push(newEvent);
-  return res.status(201).json(newEvent);
-}
+    if (!updatedEvent) {
+      return res.status(404).json({ message: "Güncellenecek etkinlik bulunamadı." });
+    }
+
+    res.json(updatedEvent);
+  } catch (err) {
+    res.status(400).json({ error: "Etkinlik güncellenirken hata oluştu: " + err.message });
+  }
+};
+
+// 6. Etkinlik Sil (DELETE /events/:id)
+exports.deleteEvent = async (req, res) => {
+  try {
+    const deletedEvent = await Event.findByIdAndDelete(req.params.id);
+    if (!deletedEvent) {
+      return res.status(404).json({ message: "Silinecek etkinlik bulunamadı." });
+    }
+    res.json({ message: "Etkinlik başarıyla silindi", id: req.params.id });
+  } catch (err) {
+    res.status(500).json({ error: "Etkinlik silinirken hata oluştu: " + err.message });
+  }
+};
