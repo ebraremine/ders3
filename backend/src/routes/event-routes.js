@@ -1,13 +1,20 @@
-const express = require('express');
-const router = express.Router();
-const eventController = require('../controllers/event-controller');
+import { Router } from "express";
+import {
+  createEvent,
+  deleteEvent,
+  getEventById,
+  getEvents,
+  getUpcomingEvents,
+  updateEvent,
+} from "../controllers/event-controller.js";
 
-// 6 Temel Rota (Endpoint)
-router.get('/health', eventController.getHealth);
-router.get('/events', eventController.getAllEvents);
-router.get('/events/:id', eventController.getEventById);
-router.post('/events', eventController.createEvent);
-router.put('/events/:id', eventController.updateEvent);
-router.delete('/events/:id', eventController.deleteEvent);
+const router = Router();
 
-module.exports = router;
+router.get("/", getEvents);
+router.get("/upcoming", getUpcomingEvents); // /:id'den önce yazılmalı
+router.get("/:id", getEventById);
+router.post("/", createEvent);
+router.patch("/:id", updateEvent);
+router.delete("/:id", deleteEvent);
+
+export default router;

@@ -3,7 +3,7 @@ dotenv.config();
 
 import { connectDatabase } from "./config/database.js";
 import * as EventModule from "./models/event-model.js";
-import * as EventsDataModule from "./data/events.js";
+import * as EventsDataModule from "./data/seed-events.js";
 
 const Event = EventModule.default || EventModule.Event;
 const eventsData = EventsDataModule.default || EventsDataModule.initialEvents || EventsDataModule.events;

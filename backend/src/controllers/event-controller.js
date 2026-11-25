@@ -1,95 +1,127 @@
-const Event = require('../models/event-model');
+import mongoose from "mongoose";
+import Event from "../models/event-model.js";
+import { todayStart } from "../utils/date.js";
 
-// 1. Sistem Durumu ve Öğrenci Numarası (GET /health)
-exports.getHealth = (req, res) => {
-  res.json({
-    status: "OK",
-    studentId: "2311012011",
-    message: "Kampüs Etkinlikleri Backend API aktif çalışıyor 🚀"
-  });
-};
+const KORUNAN_ALANLAR = ["_id", "createdAt", "updatedAt", "__v"];
 
-// 2. Tüm Etkinlikleri Listele (GET /events)
-exports.getAllEvents = async (req, res) => {
+function notFound(res) {
+  return res.status(404).json({ error: { message: "Event not found" } });
+}
+
+export async function getEvents(req, res, next) {
   try {
-    const events = await Event.find();
+    const { category, search } = req.query;
+    const filter = {};
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (search) {
+      const guvenli = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      filter.title = { $regex: guvenli, $options: "i" };
+    }
+
+    const events = await Event.find(filter).sort({ date: 1 });
     res.json(events);
   } catch (err) {
-    res.status(500).json({ error: "Etkinlikler getirilirken hata oluştu: " + err.message });
+    next(err);
   }
-};
+}
 
-// 3. Tekil Etkinlik Getir (GET /events/:id)
-exports.getEventById = async (req, res) => {
+export async function getUpcomingEvents(req, res, next) {
   try {
+    const events = await Event.find({ date: { $gte: todayStart() } }).sort({
+      date: 1,
+      time: 1,
+    });
+    res.json(events);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getEventById(req, res, next) {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return notFound(res);
+    }
+
     const event = await Event.findById(req.params.id);
     if (!event) {
-      return res.status(404).json({ message: "Aranan ID'ye sahip etkinlik bulunamadı." });
+      return notFound(res);
     }
+
     res.json(event);
   } catch (err) {
-    res.status(500).json({ error: "Etkinlik detayı getirilirken hata oluştu: " + err.message });
+    if (err.name === "CastError") {
+      return notFound(res);
+    }
+    next(err);
   }
-};
+}
 
-// 4. Yeni Etkinlik Ekle (POST /events)
-exports.createEvent = async (req, res) => {
+export async function createEvent(req, res, next) {
   try {
-    const newEvent = new Event({
-      title: req.body.title,
-      category: req.body.category,
-      capacity: Number(req.body.capacity) || 100,
-      date: req.body.date,
-      time: req.body.time || "14:00",
-      location: req.body.location,
-      description: req.body.description,
-      image: req.body.image || "/afis.svg"
+    const event = await Event.create(req.body);
+    res.status(201).json(event);
+  } catch (err) {
+    if (err.name === "ValidationError" || err.name === "CastError") {
+      return res.status(400).json({ error: { message: err.message } });
+    }
+    next(err);
+  }
+}
+
+export async function updateEvent(req, res, next) {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return notFound(res);
+    }
+
+    const body = req.body ?? {};
+    if (Object.keys(body).length === 0) {
+      return res.status(400).json({ error: { message: "Body is empty" } });
+    }
+
+    const korunan = Object.keys(body).filter((k) => KORUNAN_ALANLAR.includes(k));
+    if (korunan.length > 0) {
+      return res.status(400).json({
+        error: { message: `${korunan.join(", ")} cannot be changed` },
+      });
+    }
+
+    const event = await Event.findByIdAndUpdate(req.params.id, body, {
+      returnDocument: "after",
+      runValidators: true,
     });
 
-    const savedEvent = await newEvent.save();
-    res.status(201).json(savedEvent);
-  } catch (err) {
-    res.status(400).json({ error: "Etkinlik eklenirken hata oluştu: " + err.message });
-  }
-};
-
-// 5. Etkinlik Güncelle (PUT /events/:id)
-exports.updateEvent = async (req, res) => {
-  try {
-    const updatedEvent = await Event.findByIdAndUpdate(
-      req.params.id,
-      {
-        title: req.body.title,
-        category: req.body.category,
-        capacity: Number(req.body.capacity) || 100,
-        date: req.body.date,
-        time: req.body.time || "14:00",
-        location: req.body.location,
-        description: req.body.description,
-        image: req.body.image || "/afis.svg"
-      },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedEvent) {
-      return res.status(404).json({ message: "Güncellenecek etkinlik bulunamadı." });
+    if (!event) {
+      return notFound(res);
     }
 
-    res.json(updatedEvent);
+    res.json(event);
   } catch (err) {
-    res.status(400).json({ error: "Etkinlik güncellenirken hata oluştu: " + err.message });
-  }
-};
-
-// 6. Etkinlik Sil (DELETE /events/:id)
-exports.deleteEvent = async (req, res) => {
-  try {
-    const deletedEvent = await Event.findByIdAndDelete(req.params.id);
-    if (!deletedEvent) {
-      return res.status(404).json({ message: "Silinecek etkinlik bulunamadı." });
+    if (err.name === "ValidationError" || err.name === "CastError") {
+      return res.status(400).json({ error: { message: err.message } });
     }
-    res.json({ message: "Etkinlik başarıyla silindi", id: req.params.id });
-  } catch (err) {
-    res.status(500).json({ error: "Etkinlik silinirken hata oluştu: " + err.message });
+    next(err);
   }
-};
+}
+
+export async function deleteEvent(req, res, next) {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return notFound(res);
+    }
+
+    const event = await Event.findByIdAndDelete(req.params.id);
+    if (!event) {
+      return notFound(res);
+    }
+
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+}
